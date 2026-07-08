@@ -1,0 +1,431 @@
+{
+  "results": [
+    {
+      "n": 1,
+      "question": "List all active research projects.",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 15016,
+      "tools": 1,
+      "sources": [
+        "PRJ001",
+        "PRJ002",
+        "PRJ003",
+        "PRJ005",
+        "PRJ006",
+        "PRJ007",
+        "PRJ009",
+        "PRJ010",
+        "PRJ011",
+        "PRJ013",
+        "PRJ014",
+        "PRJ015",
+        "PRJ017",
+        "PRJ018",
+        "PRJ019"
+      ],
+      "trace_id": "7825b6b0",
+      "failures": []
+    },
+    {
+      "n": 2,
+      "question": "Show all restricted datasets.",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 15134,
+      "tools": 1,
+      "sources": [
+        "DS005",
+        "DS010",
+        "DS015",
+        "DS020"
+      ],
+      "trace_id": "e1f8cfa8",
+      "failures": []
+    },
+    {
+      "n": 3,
+      "question": "Which datasets relate to diabetes?",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 15126,
+      "tools": 1,
+      "sources": [
+        "DS001"
+      ],
+      "trace_id": "067114c3",
+      "failures": []
+    },
+    {
+      "n": 4,
+      "question": "Which projects can alice access?",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 15092,
+      "tools": 1,
+      "sources": [
+        "PRJ007",
+        "PRJ018"
+      ],
+      "trace_id": "dcb46612",
+      "failures": []
+    },
+    {
+      "n": 5,
+      "question": "Describe DS005.",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 14620,
+      "tools": 1,
+      "sources": [
+        "DS005"
+      ],
+      "trace_id": "d2c5ac6e",
+      "failures": []
+    },
+    {
+      "n": 6,
+      "question": "Run an analysis on DS001.",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 15152,
+      "tools": 2,
+      "sources": [
+        "DS001"
+      ],
+      "trace_id": "c1996b84",
+      "failures": []
+    },
+    {
+      "n": 7,
+      "question": "Run an analysis on DS005.",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 15105,
+      "tools": 2,
+      "sources": [
+        "DS005"
+      ],
+      "trace_id": "6f5f7b4d",
+      "failures": []
+    },
+    {
+      "n": 8,
+      "question": "Find datasets related to respiratory disease.",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 15131,
+      "tools": 3,
+      "sources": [
+        "DS003",
+        "DS017"
+      ],
+      "trace_id": "c5275933",
+      "failures": []
+    },
+    {
+      "n": 9,
+      "question": "Which completed projects are available?",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 14622,
+      "tools": 1,
+      "sources": [
+        "PRJ004",
+        "PRJ008",
+        "PRJ012",
+        "PRJ016",
+        "PRJ020"
+      ],
+      "trace_id": "5bb0c372",
+      "failures": []
+    },
+    {
+      "n": 10,
+      "question": "Show metadata for DS010.",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 15123,
+      "tools": 1,
+      "sources": [
+        "DS010"
+      ],
+      "trace_id": "0a469222",
+      "failures": []
+    },
+    {
+      "n": 11,
+      "question": "List oncology datasets.",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 15116,
+      "tools": 1,
+      "sources": [
+        "DS004"
+      ],
+      "trace_id": "2c4e9f3b",
+      "failures": []
+    },
+    {
+      "n": 12,
+      "question": "Which datasets have more than 20000 records?",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 15134,
+      "tools": 1,
+      "sources": [
+        "DS001",
+        "DS004",
+        "DS009",
+        "DS010",
+        "DS012",
+        "DS013",
+        "DS019",
+        "DS020"
+      ],
+      "trace_id": "770c63ff",
+      "failures": []
+    },
+    {
+      "n": 13,
+      "question": "Search for heart failure datasets.",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 14631,
+      "tools": 1,
+      "sources": [
+        "DS002"
+      ],
+      "trace_id": "312d97ab",
+      "failures": []
+    },
+    {
+      "n": 14,
+      "question": "What fields exist in DS003?",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 15135,
+      "tools": 1,
+      "sources": [
+        "DS003"
+      ],
+      "trace_id": "337b40d6",
+      "failures": []
+    },
+    {
+      "n": 15,
+      "question": "Who owns PRJ004?",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 15125,
+      "tools": 1,
+      "sources": [
+        "PRJ004"
+      ],
+      "trace_id": "19a82a2c",
+      "failures": []
+    },
+    {
+      "n": 16,
+      "question": "Run a query on DS002.",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 15135,
+      "tools": 2,
+      "sources": [
+        "DS002"
+      ],
+      "trace_id": "55ed5a44",
+      "failures": []
+    },
+    {
+      "n": 17,
+      "question": "List public health projects.",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 14646,
+      "tools": 1,
+      "sources": [
+        "PRJ012",
+        "PRJ014"
+      ],
+      "trace_id": "d7c28f2a",
+      "failures": []
+    },
+    {
+      "n": 18,
+      "question": "Which datasets are restricted?",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 15117,
+      "tools": 1,
+      "sources": [
+        "DS005",
+        "DS010",
+        "DS015",
+        "DS020"
+      ],
+      "trace_id": "3c198ee1",
+      "failures": []
+    },
+    {
+      "n": 19,
+      "question": "Summarise project PRJ012.",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 15104,
+      "tools": 1,
+      "sources": [
+        "PRJ012"
+      ],
+      "trace_id": "b66cf7f0",
+      "failures": []
+    },
+    {
+      "n": 20,
+      "question": "Show cardiology datasets.",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 29736,
+      "tools": 1,
+      "sources": [
+        "DS002"
+      ],
+      "trace_id": "49b9387c",
+      "failures": []
+    },
+    {
+      "n": 21,
+      "question": "Find digital health research.",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 15135,
+      "tools": 2,
+      "sources": [
+        "PRJ020"
+      ],
+      "trace_id": "4a3c4a0f",
+      "failures": []
+    },
+    {
+      "n": 22,
+      "question": "Which researcher is an administrator?",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 15166,
+      "tools": 1,
+      "sources": [],
+      "trace_id": "32acc042",
+      "failures": []
+    },
+    {
+      "n": 23,
+      "question": "Show projects related to ICU.",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 14629,
+      "tools": 1,
+      "sources": [
+        "PRJ019"
+      ],
+      "trace_id": "c320df46",
+      "failures": []
+    },
+    {
+      "n": 24,
+      "question": "Describe asthma research.",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 15116,
+      "tools": 2,
+      "sources": [
+        "PRJ017",
+        "DS017"
+      ],
+      "trace_id": "52581ac5",
+      "failures": []
+    },
+    {
+      "n": 25,
+      "question": "List all datasets available.",
+      "researcher": null,
+      "status": "PASS",
+      "latency_ms": 15127,
+      "tools": 1,
+      "sources": [
+        "DS001",
+        "DS002",
+        "DS003",
+        "DS004",
+        "DS005",
+        "DS006",
+        "DS007",
+        "DS008",
+        "DS009",
+        "DS010",
+        "DS011",
+        "DS012",
+        "DS013",
+        "DS014",
+        "DS015",
+        "DS016",
+        "DS017",
+        "DS018",
+        "DS019",
+        "DS020"
+      ],
+      "trace_id": "8bfe3548",
+      "failures": []
+    },
+    {
+      "n": 26,
+      "question": "Run an analysis on DS010.",
+      "researcher": "alice",
+      "status": "PASS",
+      "latency_ms": 15131,
+      "tools": 4,
+      "sources": [],
+      "trace_id": "ea307bf3",
+      "failures": []
+    },
+    {
+      "n": 27,
+      "question": "Run an analysis on DS010.",
+      "researcher": "laura",
+      "status": "PASS",
+      "latency_ms": 14638,
+      "tools": 1,
+      "sources": [
+        "DS010"
+      ],
+      "trace_id": "773cdc88",
+      "failures": []
+    },
+    {
+      "n": 28,
+      "question": "Run an analysis on DS010.",
+      "researcher": "admin",
+      "status": "PASS",
+      "latency_ms": 15124,
+      "tools": 1,
+      "sources": [
+        "DS010"
+      ],
+      "trace_id": "8b534197",
+      "failures": []
+    },
+    {
+      "n": 29,
+      "question": "Run an analysis on DS009.",
+      "researcher": "alice",
+      "status": "PASS",
+      "latency_ms": 15154,
+      "tools": 1,
+      "sources": [
+        "DS009"
+      ],
+      "trace_id": "8f46ddcc",
+      "failures": []
+    }
+  ]
+}

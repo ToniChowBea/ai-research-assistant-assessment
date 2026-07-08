@@ -1,0 +1,88 @@
+name: "emmanuel-research-assistant"
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ra_admin
+      POSTGRES_PASSWORD: ra_admin
+      POSTGRES_DB: research
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "ra_admin", "-d", "research"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  mcp-server:
+    build: .
+    command: ["python", "-m", "research_assistant.mcp_server.server"]
+    environment:
+      DATABASE_URL: postgresql://ra_admin:ra_admin@postgres:5432/research
+      DATABASE_URL_RO: postgresql://ra_readonly:ra_readonly@postgres:5432/research
+    ports:
+      - "8001:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  api:
+    build: .
+    command:
+      [
+        "uvicorn",
+        "research_assistant.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000",
+      ]
+    environment:
+      DATABASE_URL: postgresql://ra_admin:ra_admin@postgres:5432/research
+      DATABASE_URL_RO: postgresql://ra_readonly:ra_readonly@postgres:5432/research
+      MCP_SERVER_URL: http://mcp-server:8001/mcp
+      INNGEST_API_BASE: http://inngest:8288
+      INNGEST_SERVE_ORIGIN: http://api:8000
+      LLM_MODEL: ${LLM_MODEL:-openai:gpt-4o-mini}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:?set OPENAI_API_KEY in .env}
+      LANGSMITH_TRACING: ${LANGSMITH_TRACING:-}
+      LANGSMITH_API_KEY: ${LANGSMITH_API_KEY:-}
+      LANGSMITH_PROJECT: ${LANGSMITH_PROJECT:-nhs-research-assistant}
+      LANGSMITH_ENDPOINT: ${LANGSMITH_ENDPOINT:-}
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mcp-server:
+        condition: service_started
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+  inngest:
+    image: inngest/inngest:latest
+    command:
+      ["inngest", "dev", "-u", "http://api:8000/api/inngest", "--no-discovery"]
+    ports:
+      - "8288:8288"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:

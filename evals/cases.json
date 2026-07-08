@@ -1,0 +1,242 @@
+[
+  {
+    "question": "List all active research projects.",
+    "must_include": [
+      "PRJ001",
+      "PRJ002",
+      "PRJ003",
+      "PRJ005",
+      "PRJ006",
+      "PRJ007",
+      "PRJ009",
+      "PRJ010",
+      "PRJ011",
+      "PRJ013",
+      "PRJ014",
+      "PRJ015",
+      "PRJ017",
+      "PRJ018",
+      "PRJ019"
+    ]
+  },
+  {
+    "question": "Show all restricted datasets.",
+    "must_include": [
+      "DS005",
+      "DS010",
+      "DS015",
+      "DS020"
+    ]
+  },
+  {
+    "question": "Which datasets relate to diabetes?",
+    "must_include": [
+      "DS001"
+    ]
+  },
+  {
+    "question": "Which projects can alice access?",
+    "must_include": [
+      "PRJ007",
+      "PRJ018"
+    ]
+  },
+  {
+    "question": "Describe DS005.",
+    "must_include": [
+      "DS005"
+    ]
+  },
+  {
+    "question": "Run an analysis on DS001.",
+    "must_include": [
+      "DS001"
+    ],
+    "expect_suppression": false
+  },
+  {
+    "question": "Run an analysis on DS005.",
+    "must_include": [
+      "DS005"
+    ],
+    "expect_suppression": true
+  },
+  {
+    "question": "Find datasets related to respiratory disease.",
+    "must_include": [
+      "DS003"
+    ]
+  },
+  {
+    "question": "Which completed projects are available?",
+    "must_include": [
+      "PRJ004",
+      "PRJ008",
+      "PRJ012",
+      "PRJ016",
+      "PRJ020"
+    ]
+  },
+  {
+    "question": "Show metadata for DS010.",
+    "must_include": [
+      "DS010"
+    ]
+  },
+  {
+    "question": "List oncology datasets.",
+    "must_include": [
+      "DS004"
+    ]
+  },
+  {
+    "question": "Which datasets have more than 20000 records?",
+    "must_include": [
+      "DS001",
+      "DS004",
+      "DS009",
+      "DS010",
+      "DS012",
+      "DS013",
+      "DS019",
+      "DS020"
+    ]
+  },
+  {
+    "question": "Search for heart failure datasets.",
+    "must_include": [
+      "DS002"
+    ]
+  },
+  {
+    "question": "What fields exist in DS003?",
+    "must_include": [
+      "DS003"
+    ]
+  },
+  {
+    "question": "Who owns PRJ004?",
+    "must_include": [
+      "PRJ004"
+    ],
+    "answer_contains": [
+      "David Green"
+    ]
+  },
+  {
+    "question": "Run a query on DS002.",
+    "must_include": [
+      "DS002"
+    ],
+    "skip_suppression": true,
+    "note": "DS002 (Heart Failure Registry) has 10,796 records; whether any group falls under the k=5 threshold depends on the agent's free choice of query, so suppression is non-deterministic here. Deterministic suppression is asserted on DS005 (2 rows) at 'Run an analysis on DS005.'"
+  },
+  {
+    "question": "List public health projects.",
+    "must_include": [
+      "PRJ012",
+      "PRJ014"
+    ]
+  },
+  {
+    "question": "Which datasets are restricted?",
+    "must_include": [
+      "DS005",
+      "DS010",
+      "DS015",
+      "DS020"
+    ]
+  },
+  {
+    "question": "Summarise project PRJ012.",
+    "must_include": [
+      "PRJ012"
+    ]
+  },
+  {
+    "question": "Show cardiology datasets.",
+    "must_include": [
+      "DS002"
+    ]
+  },
+  {
+    "question": "Find digital health research.",
+    "must_include": [
+      "PRJ020"
+    ]
+  },
+  {
+    "question": "Which researcher is an administrator?",
+    "skip_sources": true,
+    "answer_contains": [
+      "admin"
+    ]
+  },
+  {
+    "question": "Show projects related to ICU.",
+    "must_include": [
+      "PRJ019"
+    ]
+  },
+  {
+    "question": "Describe asthma research.",
+    "must_include": [
+      "PRJ017"
+    ]
+  },
+  {
+    "question": "List all datasets available.",
+    "must_include": [
+      "DS001",
+      "DS002",
+      "DS003",
+      "DS004",
+      "DS005",
+      "DS006",
+      "DS007",
+      "DS008",
+      "DS009",
+      "DS010",
+      "DS011",
+      "DS012",
+      "DS013",
+      "DS014",
+      "DS015",
+      "DS016",
+      "DS017",
+      "DS018",
+      "DS019",
+      "DS020"
+    ]
+  },
+  {
+    "question": "Run an analysis on DS010.",
+    "researcher": "alice",
+    "expect_denied": true,
+    "dataset": "DS010"
+  },
+  {
+    "question": "Run an analysis on DS010.",
+    "researcher": "laura",
+    "expect_denied": false,
+    "must_include": [
+      "DS010"
+    ]
+  },
+  {
+    "question": "Run an analysis on DS010.",
+    "researcher": "admin",
+    "expect_denied": false,
+    "must_include": [
+      "DS010"
+    ]
+  },
+  {
+    "question": "Run an analysis on DS009.",
+    "researcher": "alice",
+    "expect_denied": false,
+    "must_include": [
+      "DS009"
+    ]
+  }
+]

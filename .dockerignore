@@ -1,0 +1,14 @@
+.venv
+.git
+.gitignore
+__pycache__
+*.pyc
+.env
+.env.*
+!.env.example
+dev-docs
+evals
+node_modules
+.claude
+.python-version
+*.md
