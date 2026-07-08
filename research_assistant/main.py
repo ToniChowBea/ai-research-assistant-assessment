@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from scalar_fastapi import get_scalar_api_reference, Theme
 from research_assistant.core.api import router as api_router
-from research_assistant.workflow.routes import mount_inngest
 
 
 def create_app():
@@ -25,12 +24,6 @@ def create_app():
 
     # ----- Attach routes -----------
     app.include_router(api_router)
-
-    # ----- Inngest (durable workflow) -----------
-    mount_inngest(app)
-    for route in app.routes:
-        if getattr(route, "path", "").startswith("/api/inngest"):
-            route.include_in_schema = False
 
     return app
 

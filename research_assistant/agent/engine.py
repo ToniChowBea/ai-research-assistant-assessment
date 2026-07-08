@@ -1,7 +1,6 @@
 import json
 import time
 
-import inngest
 from langchain.agents import create_agent
 from langchain_core.messages import ToolMessage
 from langchain_mcp_adapters.client import MultiServerMCPClient
@@ -10,9 +9,6 @@ from pydantic import BaseModel, Field
 
 from research_assistant.agent.prompts import SYSTEM_PROMPT
 from research_assistant.config import get_settings
-from research_assistant.governance import apply_response_policies
-from research_assistant.audit import persist_audit
-from research_assistant.workflow.client import inngest_client
 
 RECURSION_LIMIT = 25
 
@@ -163,28 +159,3 @@ async def run_agent(
         "error": error,
         "duration_ms": int((time.perf_counter() - started) * 1000),
     }
-
-
-# ------------------------------------
-# --- Inngest Workflow
-# ------------------------------------
-@inngest_client.create_function(
-    fn_id="research_query",
-    trigger=inngest.TriggerEvent(event="research/query.requested"),
-)
-async def research_query(ctx: inngest.Context) -> dict:
-    question = ctx.event.data["question"]
-    trace_id = ctx.event.data["trace_id"]
-    researcher = ctx.event.data.get("researcher")
-
-    run = await ctx.step.run(
-        "run_agent", lambda: run_agent(question, trace_id, researcher)
-    )
-    governed = await ctx.step.run(
-        "govern", lambda: apply_response_policies(run, {"researcher": researcher})
-    )
-    await ctx.step.run(
-        "persist_audit",
-        lambda: persist_audit(trace_id, question, governed, researcher),
-    )
-    return {"answer": governed["answer"], "sources": governed["sources"]}

@@ -4,7 +4,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
-    inngest_api_base: str = "http://localhost:8288"
     database_url: str = ""
     database_url_ro: str = ""
     llm_model: str = "openai:gpt-4o-mini"

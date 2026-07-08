@@ -1,5 +1,5 @@
 .DEFAULT_GOAL := help
-.PHONY: help env db seed mcp api inspector inngest stack up down db-seed logs eval
+.PHONY: help env db seed mcp api inspector stack up down db-seed logs eval test
 
 help:            ## show available targets
 	@grep -E '^[a-z-]+:.*##' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  make %-12s %s\n", $$1, $$2}'
@@ -22,13 +22,9 @@ api:             ## run the FastAPI app on :8000 (loads .env for the LLM key)
 inspector:       ## open the MCP Inspector UI
 	npx @modelcontextprotocol/inspector
 
-inngest:         ## run the Inngest dev server alone (dashboard on :8288)
-	npx inngest-cli@latest dev -u http://localhost:8000/api/inngest
-
-stack: seed      ## run EVERYTHING in one terminal: db + seed + MCP + Inngest + API (Ctrl-C stops all)
+stack: seed      ## run everything in one terminal: db + seed + MCP + API (Ctrl-C stops all)
 	@trap 'kill 0' EXIT INT TERM; \
 	uv run --env-file .env python -m research_assistant.mcp_server.server 2>&1 | sed 's/^/[mcp] /' & \
-	npx inngest-cli@latest dev -u http://localhost:8000/api/inngest 2>&1 | sed 's/^/[inn] /' & \
 	sleep 1; \
 	uv run --env-file .env uvicorn research_assistant.main:app --port 8000 2>&1 | sed 's/^/[api] /'; \
 	wait
@@ -49,3 +45,6 @@ down:            ## stop and remove the Docker stack (add -v to also wipe the db
 
 eval:            ## run eval suite (25 questions + RBAC) against a running API
 	uv run python -m evals.run
+
+test:            ## run the unit test suite (pytest, no DB needed)
+	uv run --group dev pytest -q

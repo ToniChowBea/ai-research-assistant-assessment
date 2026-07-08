@@ -9,12 +9,6 @@ class QueryRequest(BaseModel):
     )
 
 
-class QueryResponse(BaseModel):
-    answer: str
-    sources: list[str]
-    trace_id: str
-
-
 class AuditRecord(BaseModel):
     """One per-request audit row (requirement #5)."""
 
@@ -28,6 +22,13 @@ class AuditRecord(BaseModel):
     researcher: str | None = None
     researcher_profile: dict | None = None
     created_at: datetime
+
+
+class QueryResponse(BaseModel):
+    answer: str
+    sources: list[str]
+    trace_id: str
+    audit: AuditRecord | None = None
 
 
 class Researcher(BaseModel):

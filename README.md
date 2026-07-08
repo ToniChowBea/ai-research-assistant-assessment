@@ -10,14 +10,14 @@ and _data_ is physical rather than conventional: **the agent never touches the d
 
 ## Tech stack
 
-| Layer         | Technology                    | Why                                                                                                                                                  |
-| ------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| API           | **FastAPI**                   | Async, typed request/response; auto docs via Scalar at `/docs`.                                                                                      |
-| Orchestration | **Inngest**                   | Durable, retryable, replayable workflow steps; `POST /query` stays synchronous via invoke-and-await.                                                 |
-| Agent         | **LangGraph**                 | Prebuilt ReAct loop with schema-enforced structured output and native MCP tools; provider-agnostic, so we ship value without re-inventing the wheel. |
-| Protocol      | **FastMCP** (streamable HTTP) | The MCP server runs as its own service — the physical "agent never touches data" boundary.                                                           |
-| Data          | **PostgreSQL + asyncpg**      | Real SQL for real analysis; identifiers validated, values parameterised, all reads under a read-only role.                                           |
-| Packaging     | **Docker Compose + uv**       | Four services from one image; one command (`make up`); lockfile-reproducible.                                                                        |
+| Layer         | Technology                         | Why                                                                                                                                                  |
+| ------------- | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| API           | **FastAPI**                        | Async, typed request/response; auto docs via Scalar at `/docs`.                                                                                      |
+| Orchestration | **Plain async** (in `core/api.py`) | A direct `run_agent → govern → audit` pipeline; a durable engine (Inngest/Temporal) drops into the same seam when needed.                            |
+| Agent         | **LangGraph**                      | Prebuilt ReAct loop with schema-enforced structured output and native MCP tools; provider-agnostic, so we ship value without re-inventing the wheel. |
+| Protocol      | **FastMCP** (streamable HTTP)      | The MCP server runs as its own service — the physical "agent never touches data" boundary.                                                           |
+| Data          | **PostgreSQL + asyncpg**           | Real SQL for real analysis; identifiers validated, values parameterised, all reads under a read-only role.                                           |
+| Packaging     | **Docker Compose + uv**            | Three services from one image; one command (`make up`); lockfile-reproducible.                                                                       |
 
 ## Architecture
 
@@ -29,7 +29,7 @@ A request flows down the layers; the answer comes back up.
          ▼
  ┌─ API (FastAPI)          mints trace_id, delegates all reasoning
  │
- ├─ Inngest workflow       durable steps: run_agent → govern → persist_audit
+ ├─ Orchestration          run_agent → govern → persist_audit  (direct async)
  │
  ├─ Agent (LangGraph)      decides which tools to call
  │
@@ -46,12 +46,12 @@ A request flows down the layers; the answer comes back up.
 **API** — `core/api.py`
 
 - Endpoints: `POST /query` (`?researcher=` optional), `GET /audit`, `GET /audit/{trace_id}`, `GET /researchers`, `GET /health`
-- Delegates all reasoning: mints `trace_id`, fires the workflow, returns the result
+- Delegates all reasoning: mints `trace_id`, runs the pipeline, returns the result
 
-**Orchestration** — `agent/engine.py` + Inngest
+**Orchestration** — inlined in `core/api.py`
 
-- One durable function `research_query`: `run_agent → govern → persist_audit`, each step retried independently
-- Keeps `POST /query` synchronous by sending the event and awaiting the run
+- The `/query` handler awaits a direct pipeline: `run_agent → govern → persist_audit`
+- Synchronous; a durable engine (Inngest, Temporal) would wrap these three as retryable steps for long-running jobs, without touching agent or tool logic
 
 **Agent** — `agent/engine.py` (LangGraph ReAct)
 
@@ -87,9 +87,8 @@ way around it. Policies are a **pluggable registry** (adding one = a new file in
 
 ## Observability
 
-Failures can come from any layer, so observability spans three axes, correlated by one `trace_id`:
+Failures can come from any layer, so observability spans two axes, correlated by one `trace_id`:
 
-- **Platform — Inngest.** The full run end-to-end: per-step durability, retries, replay.
 - **Agent — LangSmith.** The agent's internal reasoning and tool calls (optional, env-driven).
 - **Audit — Postgres.** A persistent `audit_log` row per request: id, tools invoked, governance
   decisions, duration, errors, and the requesting researcher (with a minimal profile on the
@@ -97,19 +96,20 @@ Failures can come from any layer, so observability spans three axes, correlated 
 
 ## Setup
 
-Requires Docker. Full setup in `GETTING_STARTED.md`
+Requires Docker. Full setup in `GETTING_STARTED.md`.
 
 ```bash
 make up
 ```
 
 One command: creates `.env` (LLM key pre-filled), builds the image, starts `postgres`,
-`mcp-server`, `api` and `inngest`, and seeds the mock data.
+`mcp-server` and `api`, and seeds the mock data.
 
 ```bash
 curl -s localhost:8000/query -H 'content-type: application/json' \
   -d '{"question": "Which datasets relate to diabetes?"}'
-# → { "answer": "...", "sources": ["DS001"], "trace_id": "..." }
+# → { "answer": "...", "sources": ["DS001"], "trace_id": "...",
+#     "audit": { tools_invoked, governance, duration_ms, researcher, ... } }
 ```
 
 ## Evals
@@ -122,12 +122,11 @@ read from the audit table — guarding against regressions rather than grading p
 
 ```
 research_assistant/
-├── main.py         # FastAPI app factory (Scalar docs, Inngest mount)
+├── main.py         # FastAPI app factory (Scalar docs)
 ├── config.py       # env-driven settings (pydantic-settings)
 ├── audit.py        # audit_log read/write
-├── core/           # api.py (routes) · types.py (request/response schemas)
-├── workflow/       # Inngest client + /api/inngest mount
-├── agent/          # engine.py (LangGraph agent + durable workflow) · prompts.py
+├── core/           # api.py (routes + orchestration) · types.py (request/response schemas)
+├── agent/          # engine.py (LangGraph agent) · prompts.py
 ├── mcp_server/     # server.py (FastMCP, 11 tools) · tools.py (adapters, zero SQL)
 ├── data_api/       # lookups · introspection · analysis (run_analysis) · guardrails
 ├── governance/     # engine.py (registry) · policies/ (min_records, grounding, researcher_access)
@@ -146,7 +145,7 @@ mock-data/          # provided synthetic data (never modified)
 
 ## Limitations
 
-- No response streaming yet; the synchronous invoke-and-await trades a little latency for durability.
+- No response streaming yet; `POST /query` blocks until the run completes.
 - DS011–DS020 are metadata-only (no analysable rows).
 - `researcher_access` is enforced after the query runs (the read happens; the answer is withheld).
 - `min_records` suppresses on total underlying records, not per-group cells.
@@ -157,8 +156,10 @@ mock-data/          # provided synthetic data (never modified)
   withheld after the fact.
 - Deterministic source extraction (from run state / tool calls) instead of trusting the agent's
   structured output.
-- Stream responses to the client so researchers dont have to wait until full analysis is done.
-- Interupt, researchers should be able to interupt runs
+- A durable workflow engine (Inngest, Temporal) for retry-heavy or
+  long-running research jobs — without touching agent or tool logic.
+- Stream responses to the client so researchers don't have to wait until the full analysis is done.
+- Interruption: researchers should be able to interrupt runs.
 - Client-side observability so researchers can watch the agent's steps as they happen.
 - Test-driven development: a unit/integration suite (governance policies, guardrails, tool-payload
   extraction) alongside the black-box evals, so regressions are caught before a run reaches them.

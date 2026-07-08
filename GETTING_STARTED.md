@@ -9,17 +9,14 @@ From a fresh clone to a working assistant, using only `make`. Run `make help` to
 ## 1. Start everything
 
 ```bash
-make up
-make logs # tail logs
+make up          # build + start + seed (detached)
+make logs        # tail logs (optional)
 ```
 
-One command: creates `.env`, builds the image, starts `postgres`, `mcp-server`, `api` and
-`inngest`, and seeds the mock data. It runs detached, so the stack keeps running after it returns.
+One command: creates `.env`, builds the image, starts `postgres`, `mcp-server` and `api`, and
+seeds the mock data. It runs detached, so the stack keeps running after it returns.
 
 - Watch logs: `make logs` · Stop: `make down` · Wipe the DB: `make down && docker compose down -v`
-
-> **First query returns a 502?** Give it ~10s after `make up` — the Inngest dev server needs a
-> moment to sync the workflow functions. Retry and it clears.
 
 ---
 
@@ -37,7 +34,14 @@ curl -s localhost:8000/query \
 {
   "answer": "…Primary Care Diabetes Cohort…",
   "sources": ["DS001"],
-  "trace_id": "1de50134"
+  "trace_id": "1de50134",
+  "audit": {
+    "tools_invoked": [{ "tool": "search_datasets", "args": "{'query': 'diabetes'}" }],
+    "governance": [],
+    "duration_ms": 4200,
+    "researcher": null,
+    "created_at": "…"
+  }
 }
 ```
 
@@ -61,7 +65,7 @@ curl -s "localhost:8000/query?researcher=alice" \
 
 > A researcher who **is** on that project (e.g. `laura`) passes the RBAC check.
 
-Every response carries a `trace_id` — keep it for step 5.
+Every response carries a `trace_id` — keep it for step 4.
 
 ---
 
@@ -75,18 +79,10 @@ Every response carries a `trace_id` — keep it for step 5.
 
 ---
 
-## 4. Monitor a run in Inngest
+## 4. Get the audit for a run
 
-1. Open **http://localhost:8288** → **Runs**.
-2. Open the most recent run to see the durable workflow as a waterfall:
-   **`run_agent` → `govern` → `persist_audit`**.
-3. Click any step for its input, output, timing, and any retries.
-
----
-
-## 5. Get the audit for a run
-
-Every request writes one audit row, looked up by its `trace_id`.
+The full audit is **embedded in every `/query` response under the `audit` key**, so you
+usually don't need a second call. You can also fetch it standalone by `trace_id`:
 
 **Via curl:**
 
@@ -96,6 +92,7 @@ curl -s localhost:8000/audit              # recent runs, newest first
 ```
 
 When you supplied `?researcher=`, the single-run record also includes a minimal researcher profile.
+The same `trace_id` opens the run in LangSmith when `LANGSMITH_TRACING` is enabled.
 
 **Via the docs page:** open **http://localhost:8000/docs** → **`GET /audit/{trace_id}`** →
 **Test Request** → paste the `trace_id` → **Send**.
@@ -109,10 +106,10 @@ everything else runs via `uv`.
 
 ```bash
 make env         # once: create .env
-make stack       # postgres + seed + MCP + Inngest + API in one terminal (prefixed logs; Ctrl-C stops all)
+make stack       # postgres + seed + MCP + API in one terminal (prefixed logs; Ctrl-C stops all)
 ```
 
-Finer control: `make db`, `make seed`, `make mcp`, `make api`, `make inngest`, `make inspector`.
+Finer control: `make db`, `make seed`, `make mcp`, `make api`, `make inspector`.
 
 ---
 
@@ -128,9 +125,8 @@ Prints per-question `PASS`/`FAIL` and latency percentiles against the running AP
 
 ## Troubleshooting
 
-| Symptom                     | Fix                                                      |
-| --------------------------- | -------------------------------------------------------- |
-| First `/query` is a 502     | Inngest hasn't synced yet (~10s after `make up`). Retry. |
-| Answers say data is missing | The seed didn't run — `make db-seed`.                    |
-| `make up` fails on a port   | 5432 / 8000 / 8001 / 8288 already in use — free it.      |
-| Want a clean database       | `make down` then `docker compose down -v`.               |
+| Symptom | Fix |
+| --- | --- |
+| Answers say data is missing | The seed didn't run — `make db-seed`. |
+| `make up` fails on a port | 5432 / 8000 / 8001 already in use — free it. |
+| Want a clean database | `make down` then `docker compose down -v`. |
