@@ -6,9 +6,6 @@ __pycache__
 .env
 .env.*
 !.env.example
-dev-docs
 evals
-node_modules
-.claude
 .python-version
 *.md
