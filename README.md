@@ -157,6 +157,8 @@ mock-data/          # provided synthetic data (never modified)
   withheld after the fact.
 - Deterministic source extraction (from run state / tool calls) instead of trusting the agent's
   structured output.
+- Stream responses to the client so researchers dont have to wait until full analysis is done.
+- Interupt, researchers should be able to interupt runs
 - Client-side observability so researchers can watch the agent's steps as they happen.
 - Test-driven development: a unit/integration suite (governance policies, guardrails, tool-payload
   extraction) alongside the black-box evals, so regressions are caught before a run reaches them.
